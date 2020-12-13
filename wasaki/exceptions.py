@@ -1,0 +1,2 @@
+class CharLimitExceedError(Exception):
+    pass

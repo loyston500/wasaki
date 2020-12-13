@@ -1,10 +1,11 @@
+from typing import List
 from converters.base_converter import BaseConverter
 
-class AutoResponderForWA(BaseConverter):
 
+class AutoResponderForWA(BaseConverter):
     @staticmethod
     def replier_none() -> dict:
-        return {'replies': []}
+        return {"replies": []}
 
     @staticmethod
     def parser(response: dict) -> dict:
@@ -18,7 +19,7 @@ class AutoResponderForWA(BaseConverter):
             "is_group": response.get("query").get("isGroup"),
             "rule_id": response.get("query").get("ruleId"),
         }
-    
+
     @staticmethod
-    def replier(*messages: 'list[str]'):
-        return {'replies': [{"message":message} for message in messages]}
+    def replier(*messages: List[str]):
+        return {"replies": [{"message": message} for message in messages]}

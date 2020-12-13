@@ -1,8 +1,7 @@
 class BaseConverter:
-
     @staticmethod
     def replier_none() -> dict:
-        return {"messages":[]}
+        return {"messages": []}
 
     @staticmethod
     def parser(response: dict) -> dict:
@@ -15,5 +14,5 @@ class BaseConverter:
         return response
 
     @staticmethod
-    def replier(*messages: 'list[str]') -> dict:
-        return {"messages":messages}
+    def replier(*messages: "list[str]") -> dict:
+        return {"messages": messages}
