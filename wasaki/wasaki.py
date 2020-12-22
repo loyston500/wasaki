@@ -4,8 +4,8 @@
 # import flask
 import quart
 from typing import Any, Optional, Callable
-from converters.base_converter import BaseConverter
-from wasaki.context import Context
+from wasaki.converters.base_converter import BaseConverter
+from wasaki.wasaki.context import Context
 
 
 class Bot:
@@ -43,7 +43,7 @@ class Bot:
             return ret
 
     def _route(self) -> None:
-        @self.app.route("/", methods=["POST"])
+        @self.app.route("/", methods=["POST", "GET"])
         async def routing() -> dict:
             try:
                 response = await quart.request.get_json()  # changes from flask to quart
@@ -86,6 +86,6 @@ class Bot:
                 else:
                     return self.converter.replier_none()
 
-    def run(self) -> None:
+    def run(self, *args, **kwargs) -> None:
         self._route()
-        self.app.run(debug=True)
+        self.app.run(*args, **kwargs)

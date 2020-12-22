@@ -1,5 +1,6 @@
 from typing import List
-from converters.base_converter import BaseConverter
+from wasaki.converters.base_converter import BaseConverter
+from wasaki.wasaki.sembed import Sembed
 
 
 class AutoResponderForWA(BaseConverter):
@@ -22,4 +23,4 @@ class AutoResponderForWA(BaseConverter):
 
     @staticmethod
     def replier(*messages: List[str]):
-        return {"replies": [{"message": message} for message in messages]}
+        return {"replies": [{"message": str(message)} for message in messages]}

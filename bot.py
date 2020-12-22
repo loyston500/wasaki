@@ -47,7 +47,7 @@ async def say(
 
 
 @bot.event  # this event is triggered when the received message is not a command.
-async def on_other_message(
+async def on_not_command(
     ctx,
 ):  # keep is mind that rest_mesaage is set to None in events so you should use "message" attribute
     print(f"{ctx.author} said {ctx.message}")
@@ -59,4 +59,4 @@ async def on_error(ctx, error):
     return ctx.reply(f"an error occured somewhere, {error}")
 
 
-bot.run()
+bot.run(debug=True)
