@@ -8,7 +8,6 @@ Before getting started, make sure you have:
 
 1. Cloned this repo in a certain folder.
     To clone, just run `git clone https://github.com/loyston500/wasaki`.
-    This will create a folder called `myfolder` in your current directory and then clone the repo inside it.
     
 2. Aiohttp installed.
     If you don't know what quart is, it's a lib which we gonna use to host our webserver.
