@@ -1,11 +1,15 @@
-from typing import Any
+import typing
 
 
 class Context:
-    def __init__(self, rest_message: str, reply, response) -> None:
+    def __init__(self, rest_message: str, request: dict) -> None:
         self.rest_message = rest_message
-        self.response = response
-        self.reply = reply
+        self.request = request
+        # self.reply = reply
 
-    def __getattr__(self, key) -> Any:
-        return self.response[key]
+    @staticmethod
+    def reply(*messages):
+        return messages
+
+    def __getattr__(self, key: str) -> typing.Any:
+        return self.request[key]

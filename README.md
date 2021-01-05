@@ -7,12 +7,12 @@ This is going to be easy if you are familiar with discord.py, as you are going t
 Before getting started, make sure you have:
 
 1. Cloned this repo in a certain folder.
-    To clone, just run `mkdir myfolder; cd myfolder; git clone https://github.com/loyston500/wasaki`.
+    To clone, just run `git clone https://github.com/loyston500/wasaki`.
     This will create a folder called `myfolder` in your current directory and then clone the repo inside it.
     
-2. Quart installed.
+2. Aiohttp installed.
     If you don't know what quart is, it's a lib which we gonna use to host our webserver.
-    To install it, run `pip install quart`    
+    To install it, run `pip install aiohttp`    
     
 3. ngrok downloaded.
     Ngrok is a tool that is used to forward our localhost to a public address so that it can be accessed by other devices over the internet.
@@ -21,23 +21,26 @@ Before getting started, make sure you have:
 4. Auto Responder app which supportes interaction with web servers.
     I'd recommend `AutoResponder WA`
     
-Now on the `myfolder`, create a python file, for example: `main.py`. You are going to write your bot's code here.
+Now create a python file, for example: `bot.py`. You are going to write your bot's code here.
 
 ### A ping pong bot example
 ```py
-from wasaki.wasaki.wasaki import Bot
-from wasaki.converters.auto_responder_for_wa import AutoResponderForWA
+import sys
+sys.path.append("path/to/wasaki")
 
-bot = Bot(prefix="bt!", converter=AutoResponderForWA)
+from wasaki.command_handler import Bot
+from wasaki.app import auto_responder_wa 
+
+bot = Bot(prefix="bt!", app=auto_responder_wa.AutoResponderForWA)
 
 @bot.command()
 async def ping(ctx):
-    return ctx.reply("pong!")
+    return "pong!"
     
-bot.run(debug=True)
+bot.run()
 ```
 
-Now once you run your bot file, you'll see some weird text poping out, don't worry about that, It means your webserver has been started and it can be accessed using the local host address (127.0.0.1).
+Now once you run your bot file, you'll see some weird text poping out, don't worry about that, it means that your web server has started and it can be accessed using the local host address (127.0.0.1).
 Now open up another terminal, locate to the directory where you have extracted ngrok, and then run 
 `ngrok http 5000` if you are on windows.
 `./ngrok http 5000` if you are on linux.

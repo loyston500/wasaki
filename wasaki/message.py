@@ -1,7 +1,12 @@
 import re
 
+from typing import Callable
 
-def arg_parser(mes: str) -> (dict, list, set):
+
+def _arg_parser(mes: str) -> (dict, list, set):
+    """
+    an argument parser written in python
+    """
     mes = re.findall(r'[^\s"]+|"[^"]*"', mes)
     i = 0
     length = len(mes)
@@ -23,3 +28,27 @@ def arg_parser(mes: str) -> (dict, list, set):
     except IndexError:
         raise Exception("Invalid Syntax")
     return (params, inputs, flags)
+
+
+try:
+    from wasaki.speedups.speedups import arg_parser as _arg_parser
+except ImportError:
+    pass
+else:
+    print("message module using speedups")
+
+
+def parse_using(parser):
+    def decorator(func) -> Callable:
+        async def wrap(ctx) -> dict:
+            return await func(ctx, *parser(ctx.rest_message))
+
+        wrap.__name__ = func.__name__
+        wrap.__doc__ = func.__doc__
+        return wrap
+
+    return decorator
+
+
+def argify():
+    return parse_using(_arg_parser)
