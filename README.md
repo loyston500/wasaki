@@ -41,8 +41,8 @@ bot.run()
 
 Now once you run your bot file, you'll see some weird text poping out, don't worry about that, it means that your web server has started and it can be accessed using the local host address (127.0.0.1).
 Now open up another terminal, locate to the directory where you have extracted ngrok, and then run 
-`ngrok http 5000` if you are on windows.
-`./ngrok http 5000` if you are on linux.
+`ngrok http 8080` if you are on windows.
+`./ngrok http 8080` if you are on linux.
 
 This should show you something like ![screenshot](https://media.discordapp.net/attachments/781733449656041482/791547198868815922/Screenshot_4.png)
 Copy the url.
