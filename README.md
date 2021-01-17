@@ -10,7 +10,7 @@ Before getting started, make sure you have:
     To clone, just run `git clone https://github.com/loyston500/wasaki`.
     
 2. Aiohttp installed.
-    If you don't know what quart is, it's a lib which we gonna use to host our webserver.
+    If you don't know what it is, it's a lib which we're gonna use to host our webserver.
     To install it, run `pip install aiohttp`    
     
 3. ngrok downloaded.
