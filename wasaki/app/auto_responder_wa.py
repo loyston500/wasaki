@@ -1,4 +1,16 @@
-import typing
+__all__ = (
+    "NotInDmError",
+    "NotInGroupError",
+    "UnprivilegedUserError",
+    "AutoResponderWA",
+    "group_only",
+    "dm_only",
+    "only_for_users",
+)
+
+from typing import *
+from .base import App, Request, Response
+from ..context import Context
 
 
 class NotInGroupError(Exception):
@@ -13,84 +25,95 @@ class UnprivilegedUserError(Exception):
     pass
 
 
-class AutoResponderWA:
-    @staticmethod
-    def replier_none() -> dict:
-        return {"replies": []}
+class AutoResponderWA(App):
+    def request_to_default(self, request: Request) -> Request:
+        query: Dict[Any, Any] = request["query"]
+        return dict(
+            message=query["message"],
+            author=query.get("sender"),
+            is_group=query.get("isGroup"),
+            rule_id=query.get("ruleId"),
+            app_package_name=request.get("appPackageName"),
+            messenger_package_name=request.get("messengerPackageName"),
+        )
+
+    def request_default(self) -> Request:
+        return NotImplementedError
+
+    def default_to_response(self, response: Response) -> Response:
+        return dict(replies=[dict(message=message) for message in response["messages"]])
+
+    def response_default(self) -> Response:
+        return dict(replies=[])
+
+    def return_to_response(self, _return: Any) -> Response:
+        if isinstance(_return, str):
+            return dict(replies=[dict(message=_return)])
+        elif isinstance(_return, tuple):
+            return dict(replies=[dict(message=str(message)) for message in _return])
+        elif _return is None:
+            return self.response_default()
+        elif isinstance(_return, dict):
+            return _return
+        else:
+            return dict(replies=[dict(message=str(_return))])
 
     @staticmethod
-    def request_convert(response: dict) -> dict:
-        # the response is something likr this, this needs to be converted to how it's in the base class.
-        # {'appPackageName': 'tkstudio.autoresponderforwa', 'messengerPackageName': 'com.whatsapp', 'query': {'sender': 'Own', 'message': 'bt!hi', 'isGroup': False, 'ruleId': 1}}
-        return {
-            "app_package_name": response.get("appPackageName"),
-            "messenger_package_name": response.get("appPackageName"),
-            "message": response.get("query").get("message"),
-            "author": response.get("query").get("sender"),
-            "is_group": response.get("query").get("isGroup"),
-            "rule_id": response.get("query").get("ruleId"),
-        }
-
-    @staticmethod
-    def replier(*messages: typing.List[str]):
-        return {"replies": [{"message": str(message)} for message in messages]}
+    def build(*messages: List[Any]) -> Response:
+        return dict(replies=[dict(message=str(message)) for message in messages])
 
 
-# check functions
-
-
-def group_only(error=True) -> typing.Callable:
+def group_only(quiet: bool = False) -> Callable:
     """
     A check function to ensure if the message is sent in a group or not.
     """
 
-    def decorator(func: typing.Awaitable):
-        async def wrap(ctx, *args, **kwargs) -> typing.Any:
+    def factory(coro: Awaitable) -> Awaitable:
+        async def wrap(ctx: Context, *args: Any, **kwargs: Any) -> Any:
             if ctx.is_group:
-                return await func(ctx, *args, **kwargs)
-            else:
-                if error:
-                    raise NotInGroupError("message was not sent in a group")
+                return await coro(ctx, *args, **kwargs)
+            elif not quiet:
+                raise NotInGroupError("message was not sent in a group")
 
-        wrap.__name__ = func.__name__
-        wrap.__doc__ = func.__doc__
+        wrap.__name__ = coro.__name__
+        wrap.__doc__ = coro.__doc__
         return wrap
 
-    return decorator
+    return factory
 
 
-def dm_only(error=True) -> typing.Callable:
+def dm_only(quiet: bool = False) -> Callable:
     """
-    A check function to ensure if the message is sent in a dm or not.
+    A check function to ensure if the message is sent in dms or not.
     """
 
-    def decorator(func: typing.Awaitable):
-        async def wrap(ctx, *args, **kwargs) -> typing.Any:
+    def factory(coro: Awaitable) -> Awaitable:
+        async def wrap(ctx: Context, *args: Any, **kwargs: Any) -> Any:
             if not ctx.is_group:
-                return await func(ctx, *args, **kwargs)
-            else:
-                if error:
-                    raise NotInDmError("message was not sent in a dm")
+                return await coro(ctx, *args, **kwargs)
+            elif not quiet:
+                raise NotInGroupError("message was not sent in dms")
 
-        wrap.__name__ = func.__name__
-        wrap.__doc__ = func.__doc__
+        wrap.__name__ = coro.__name__
+        wrap.__doc__ = coro.__doc__
         return wrap
 
-    return decorator
+    return factory
 
 
-def only_for_users(*names: typing.List[str], error=True) -> typing.Callable:
+def only_for_users(names: Iterable[str], silent: bool = False) -> Callable:
     """
     A check function to check if the author is the given name or not.
     """
 
-    def decorator(func: typing.Awaitable):
-        async def wrap(ctx, *args, **kwargs) -> typing.Any:
+    def factory(coro: Awaitable) -> Awaitable:
+        async def wrap(ctx, *args: Any, **kwargs: Any) -> Any:
             if ctx.author in names:
                 return await func(ctx, *args, **kwargs)
-            else:
-                if error:
-                    raise UnprivilegedUserError
+            elif not silent:
+                raise UnprivilegedUserError(
+                    f"unprivilaged access by author/user '{ctx.author}'"
+                )
 
         wrap.__name__ = func.__name__
         wrap.__doc__ = func.__doc__

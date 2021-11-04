@@ -1,1 +1,3 @@
 __pycache__/
+ignored
+.mypy_cache/
